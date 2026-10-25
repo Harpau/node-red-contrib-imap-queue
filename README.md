@@ -1,6 +1,8 @@
 # @compeso/node-red-contrib-imap-queue
 
-Stable release: `1.0.2`
+> **Deprecated.** `@compeso/node-red-contrib-imap-queue` is no longer maintained. Its successor is [`@compeso/node-red-contrib-imap-email`](https://www.npmjs.com/package/@compeso/node-red-contrib-imap-email) (source: [Harpau/node-red-contrib-imap-email](https://github.com/Harpau/node-red-contrib-imap-email)). Version `1.0.3` is the final release of this package; it only adds this notice and changes no runtime behavior. See [Deprecation and migration](#deprecation-and-migration).
+
+Final release: `1.0.3`
 
 Additional project documents:
 
@@ -13,6 +15,62 @@ Node-RED nodes for using an IMAP mailbox as an **at-least-once queue**.
 The package is built for queue mailboxes that may temporarily contain many messages. It does not run an unbounded `SEARCH UNDELETED` over the whole mailbox. Instead, `imap queue in` reads only a bounded front window such as `1:500`, emits a limited batch, and waits for `imap queue ack` to delete messages only after successful downstream processing.
 
 Since version `0.2.0`, mail fetching is **externally triggered only**. The input node has one input and performs exactly one bounded fetch cycle per incoming trigger message. Use an Inject node, scheduler, HTTP endpoint, link call, or your own backpressure logic to trigger it.
+
+## Deprecation and migration
+
+This package is deprecated. `@compeso/node-red-contrib-imap-email` grew out of the same code base, is actively maintained, and covers the same use case: externally triggered, bounded IMAP fetching with at-least-once ACK handling.
+
+What deprecation means for this package:
+
+```text
+Final release:        1.0.3 (this notice only, no runtime change)
+Further releases:     none planned, including dependency and security updates
+Existing installs:    keep working; nothing is removed from npm
+Issues and support:   please use the successor package
+```
+
+Why the successor is a separate package:
+
+```text
+                      imap-queue (this package)    imap-email (successor)
+Node.js               >= 18                        >= 22
+Node-RED              >= 3.0                       >= 4.0
+IMAP library          imapflow 1.x                 imapflow 2.x
+```
+
+Installations that cannot meet the successor's requirements can stay on `1.0.3`, but will receive no further updates.
+
+The successor is **not a drop-in replacement**. Node type names and settings differ, and ACK result and NACK handling change, so flows must be rebuilt with the new nodes:
+
+```text
+imap queue account   -> imap-email account
+imap queue in        -> imap-email in
+imap queue ack       -> imap-email ack
+imap queue nack      -> no separate node, see below
+```
+
+`imap queue nack` has no separate successor node. `imap-email ack` can `delete`, `move`, `copy`, or `flag` a message, or take the action from `msg.imap.ackAction`, so a failed-mailbox path is built with a second `imap-email ack` node in `move` mode. The `retry` action corresponds to simply not ACKing: the message is emitted again after the successor's `Retry after ms` timeout. `retry-now` has no direct counterpart.
+
+Recommended migration path:
+
+1. Install the successor next to this package:
+
+   ```bash
+   cd ~/.node-red
+   npm install @compeso/node-red-contrib-imap-email
+   ```
+
+2. Rebuild the flow with the `imap-email` nodes and test it against a dedicated mailbox. Do not pass an ACK token created by one package to a node of the other.
+3. Remove this package once the new flow is in production:
+
+   ```bash
+   cd ~/.node-red
+   npm uninstall @compeso/node-red-contrib-imap-queue
+   ```
+
+4. Restart Node-RED.
+
+Details of the successor's settings, message shape, and ACK actions are in its own [README](https://github.com/Harpau/node-red-contrib-imap-email#readme).
 
 ## 1. What this package does
 
@@ -610,7 +668,7 @@ For a local tarball:
 
 ```bash
 cd ~/.node-red
-npm install /path/to/compeso-node-red-contrib-imap-queue-1.0.2.tgz
+npm install /path/to/compeso-node-red-contrib-imap-queue-1.0.3.tgz
 ```
 
 ## Local development
@@ -659,6 +717,10 @@ After import, open the `imap queue account` config node and enter username and p
 - If processing fails, do not ACK. The message stays in the mailbox and will be delivered again.
 
 ## Upgrade notes
+
+### From 1.0.2 to 1.0.3
+
+Version `1.0.3` is the final release. It adds the deprecation notice and migration guidance for `@compeso/node-red-contrib-imap-email` to the documentation. Node types, settings, message shapes, and IMAP runtime behavior are unchanged.
 
 ### From 1.0.1 to 1.0.2
 

@@ -10,7 +10,7 @@ test("stable package metadata is complete", () => {
   const pkg = require(path.join(root, "package.json"));
 
   assert.equal(pkg.name, "@compeso/node-red-contrib-imap-queue");
-  assert.equal(pkg.version, "1.0.2");
+  assert.equal(pkg.version, "1.0.3");
   assert.equal(pkg.license, "MIT");
   assert.equal(pkg.publishConfig && pkg.publishConfig.access, "public");
   assert.ok(pkg.keywords.includes("node-red"));
@@ -53,4 +53,17 @@ test("release documentation exists", () => {
     assert.equal(fs.existsSync(fullPath), true, `${file} must exist`);
     assert.ok(fs.readFileSync(fullPath, "utf8").length > 100, `${file} should not be empty`);
   }
+});
+
+test("deprecation notice points to the successor package", () => {
+  const root = path.resolve(__dirname, "..");
+  const successor = "@compeso/node-red-contrib-imap-email";
+  const readme = fs.readFileSync(path.join(root, "README.md"), "utf8");
+  const changelog = fs.readFileSync(path.join(root, "CHANGELOG.md"), "utf8");
+
+  assert.ok(readme.includes("**Deprecated.**"), "README must start with the deprecation notice");
+  assert.ok(readme.includes("## Deprecation and migration"), "README must contain the migration section");
+  assert.ok(readme.includes(successor), "README must name the successor package");
+  assert.ok(changelog.includes("## 1.0.3 - Deprecation notice"), "CHANGELOG must record the deprecation release");
+  assert.ok(changelog.includes(successor), "CHANGELOG must name the successor package");
 });

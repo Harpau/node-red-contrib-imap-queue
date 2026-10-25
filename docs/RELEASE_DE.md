@@ -39,17 +39,17 @@ package.json
 
 ## 3. Git committen und taggen
 
-Fuer die stabile Version:
+Fuer die letzte Version:
 
 ```bash
 git add .
-git commit -m "Release 1.0.2"
-git tag v1.0.2
+git commit -m "Release 1.0.3"
+git tag v1.0.3
 git push
 git push --tags
 ```
 
-Fuer spaetere Patch-Releases entsprechend die Version erhoehen, testen, committen und taggen.
+`1.0.3` ist die letzte Version dieses Pakets. Weitere Releases sind nicht geplant; siehe Abschnitt 9.
 
 ## 4. Installation aus GitHub testen
 
@@ -58,7 +58,7 @@ In einem Node-RED-User-Verzeichnis:
 ```bash
 cd ~/.node-red
 npm uninstall @compeso/node-red-contrib-imap-queue
-npm install github:Harpau/node-red-contrib-imap-queue#v1.0.2
+npm install github:Harpau/node-red-contrib-imap-queue#v1.0.3
 ```
 
 Danach Node-RED neu starten und den Beispiel-Flow importieren.
@@ -68,7 +68,7 @@ Danach Node-RED neu starten und den Beispiel-Flow importieren.
 ```bash
 cd ~/.node-red
 npm uninstall @compeso/node-red-contrib-imap-queue
-npm install /path/to/compeso-node-red-contrib-imap-queue-1.0.2.tgz
+npm install /path/to/compeso-node-red-contrib-imap-queue-1.0.3.tgz
 ```
 
 Danach Node-RED neu starten.
@@ -93,22 +93,23 @@ Da das Paket scoped ist, muss es oeffentlich veroeffentlicht werden. `package.js
 
 ## 7. GitHub Release
 
-Erstelle auf GitHub einen Release fuer den Tag `v1.0.2`.
+Erstelle auf GitHub einen Release fuer den Tag `v1.0.3`.
 
 Empfohlene Assets:
 
 ```text
-compeso-node-red-contrib-imap-queue-1.0.2.tgz
+compeso-node-red-contrib-imap-queue-1.0.3.tgz
+compeso-node-red-contrib-imap-queue-1.0.3.sha256
 ```
 
-Empfohlene Release Notes fuer `1.0.2`:
+Empfohlene Release Notes fuer `1.0.3`:
 
 ```text
-Patch release for repository metadata and documentation links.
+Final release. Deprecation notice only.
 
-- Corrects package.json homepage, repository, and issues URLs to point to https://github.com/Harpau/node-red-contrib-imap-queue.
-- Updates GitHub installation examples and release documentation to use Harpau/node-red-contrib-imap-queue.
-- Keeps the npm package name unchanged: @compeso/node-red-contrib-imap-queue.
+- Deprecates @compeso/node-red-contrib-imap-queue in favor of @compeso/node-red-contrib-imap-email (https://github.com/Harpau/node-red-contrib-imap-email).
+- Adds migration guidance to README, installation guide, and release checklist.
+- No further releases are planned for this package.
 - No runtime behavior change.
 ```
 
@@ -122,4 +123,38 @@ Beobachte mindestens:
 - ACK/NACK-Verhalten gegen ein STRATO-Testpostfach.
 - Stats-Ausgaenge bei Rueckstand und Normalbetrieb.
 
-Wenn keine Aenderungen mehr noetig sind, bleibt `1.0.0` die stabile Linie. Korrekturen koennen als Patch-Releases, zum Beispiel `1.0.2`, veroeffentlicht werden.
+Version `1.0.3` ist die letzte Version dieses Pakets. Weitere Releases sind nicht geplant.
+
+## 9. Abkuendigung auf npm
+
+Reihenfolge: zuerst `1.0.3` veroeffentlichen, dann abkuendigen. `npm deprecate` markiert nur die zum Zeitpunkt des Befehls vorhandenen Versionen; eine spaeter veroeffentlichte Version waere nicht markiert.
+
+Alle Versionen des Pakets abkuendigen:
+
+```bash
+npm deprecate @compeso/node-red-contrib-imap-queue "Deprecated: superseded by @compeso/node-red-contrib-imap-email (https://www.npmjs.com/package/@compeso/node-red-contrib-imap-email). No further releases are planned. See the README for migration notes."
+```
+
+Bei aktivierter Zwei-Faktor-Authentifizierung den Einmalcode anhaengen:
+
+```bash
+npm deprecate @compeso/node-red-contrib-imap-queue "<gleiche Nachricht>" --otp=<code>
+```
+
+Kontrolle:
+
+```bash
+npm view @compeso/node-red-contrib-imap-queue@1.0.3 deprecated
+```
+
+Rueckgaengig machen; eine leere Nachricht hebt die Abkuendigung auf:
+
+```bash
+npm deprecate @compeso/node-red-contrib-imap-queue ""
+```
+
+Hinweise:
+
+- `npm install` zeigt die Nachricht danach als Warnung, npmjs.com zeigt ein Banner. Das Paket bleibt installierbar.
+- Die Node-RED Flow Library uebernimmt den Hinweis aus dem README. Dafuer muss `1.0.3` veroeffentlicht und der [Katalogeintrag](https://flows.nodered.org/node/@compeso/node-red-contrib-imap-queue) angemeldet ueber `request refresh` aktualisiert werden.
+- Optional kann das GitHub-Repository archiviert werden (`gh repo archive Harpau/node-red-contrib-imap-queue`). Es wird dann schreibgeschuetzt, inklusive Issues und Pull Requests.

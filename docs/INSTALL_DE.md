@@ -2,6 +2,8 @@
 
 Diese Anleitung beschreibt den Weg von der lokalen Paketversion zu einem GitHub-Repository und zur Installation in Node-RED.
 
+> **Abgekuendigt.** Dieses Paket wird nicht mehr weiterentwickelt. Nachfolger ist `@compeso/node-red-contrib-imap-email` (Quellcode: `Harpau/node-red-contrib-imap-email`). Version `1.0.3` ist die letzte Version; siehe Abschnitt 17.
+
 ## 1. Lokalen Paketordner entpacken
 
 Lade das ZIP-Paket herunter und entpacke es an einen Arbeitsort, z. B.:
@@ -82,7 +84,7 @@ Alternativ kann die erzeugte Tarball-Datei installiert werden:
 
 ```powershell
 cd $env:USERPROFILE\.node-red
-npm install C:\Pfad\zu\compeso-node-red-contrib-imap-queue-1.0.2.tgz
+npm install C:\Pfad\zu\compeso-node-red-contrib-imap-queue-1.0.3.tgz
 ```
 
 Danach Node-RED neu starten.
@@ -193,7 +195,7 @@ npm pack
 Git-Tag:
 
 ```bash
-git tag v1.0.2
+git tag v1.0.3
 git push --tags
 ```
 
@@ -205,3 +207,23 @@ Version `1.0.1` haertet die Behandlung von IMAP-Verbindungsfehlern. Asynchrone I
 ## 16. Patch-Version 1.0.2
 
 Version `1.0.2` korrigiert die Repository-Metadaten und GitHub-Links auf `https://github.com/Harpau/node-red-contrib-imap-queue`. Der npm-Paketname bleibt `@compeso/node-red-contrib-imap-queue`. Am Runtime-Verhalten der Nodes aendert sich nichts.
+
+## 17. Abkuendigung mit Version 1.0.3
+
+Version `1.0.3` ist die letzte Version von `@compeso/node-red-contrib-imap-queue`. Sie ergaenzt nur den Abkuendigungshinweis und die Migrationshinweise; am Runtime-Verhalten der Nodes aendert sich nichts.
+
+Nachfolger ist `@compeso/node-red-contrib-imap-email`:
+
+```bash
+cd ~/.node-red
+npm install @compeso/node-red-contrib-imap-email
+```
+
+Der Nachfolger benoetigt Node.js `>=22` und Node-RED `>=4` und ist kein Drop-in-Ersatz: Die Node-Typen heissen `imap-email account`, `imap-email in` und `imap-email ack`; einen separaten NACK-Node gibt es nicht, stattdessen uebernimmt `imap-email ack` die Aktionen `delete`, `move`, `copy` und `flag`. Bestehende Flows muessen mit den neuen Nodes nachgebaut und gegen ein dediziertes Testpostfach geprueft werden. Danach kann dieses Paket entfernt werden:
+
+```bash
+cd ~/.node-red
+npm uninstall @compeso/node-red-contrib-imap-queue
+```
+
+Weitere Releases, auch Sicherheits- oder Abhaengigkeits-Updates, sind fuer dieses Paket nicht geplant. Bestehende Installationen funktionieren weiter.
